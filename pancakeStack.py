@@ -31,10 +31,11 @@ def flip(state, layer):
 ## not started
 def aStarSearch(userInput):
     stateSpace = []
-    popCount = 0
     currentState = userInput[0:8]
+    currentState = userInput[0:8] + "-0-"
     stateSpace.append(currentState)
-    return currentState
+
+    return currentState[9:len(currentState)+1]
 
 ## not started
 def printAStarResult():
@@ -47,6 +48,7 @@ def breadthForSearch(userInput):
     currentState = userInput[0:8] + "-"
     stateSpace.append(currentState)
     while currentState[0:8] != '1w2w3w4w':
+        currentState = stateSpace[0]
         for i in range(1,5,1):
             currentStateList = list(currentState)
             currentStateList[0:8] = flip(stateSpace[0][0:8], i)
@@ -54,9 +56,9 @@ def breadthForSearch(userInput):
 
             stateSpace.append(currentState + str(i))
             if currentState[0:8] == '1w2w3w4w':
+                currentState = currentState + str(i)
                 break
         stateSpace.pop(0)
-        currentState = stateSpace[0]
     return currentState[9:len(currentState)+1]
 
 ## prints the BFS result in the proper format
