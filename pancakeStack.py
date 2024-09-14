@@ -2,30 +2,20 @@
 def flip(state, layer):
     # changing the orientation
     for n in range(1, 2*layer, 2):
-        stateList = list(state)
         if (state[n] == 'b'):
-            stateList[n] = 'w'
+            state[n] = 'w'
         elif (state[n] == 'w'):
-            stateList[n] = 'b'
-        state = ''.join(stateList)
+            state[n] = 'b'
     
     # changing the pancake order
     if (layer == 1):
-        stateList = list(state)
-        stateList[0] = stateList[0]
-        state = ''.join(stateList)
+        state[0] = state[0]
     elif (layer == 2):
-        stateList = list(state)
-        stateList[0], stateList[2] = stateList[2], stateList[0]
-        state = ''.join(stateList)
+        state[0], state[2] = state[2], state[0]
     elif (layer == 3):
-        stateList = list(state)
-        stateList[0], stateList[2], stateList[4] = stateList[4], stateList[2], stateList[0]
-        state = ''.join(stateList)
+        state[0], state[2], state[4] = state[4], state[2], state[0]
     elif (layer == 4):
-        stateList = list(state)
-        stateList[0], stateList[2], stateList[4], stateList[6] = stateList[6], stateList[4], stateList[2], stateList[0]
-        state = ''.join(stateList)
+        state[0], state[2], state[4], state[6] = state[6], state[4], state[2], state[0]
     return state
 
 ## not started
@@ -45,18 +35,20 @@ def printAStarResult():
 # of numbers that corresponds to which layers get flipped, starting at the leftmost entry
 def breadthForSearch(userInput):
     stateSpace = []
-    currentState = userInput[0:8] + "-"
+    currentState = [userInput[0:8], '']
     stateSpace.append(currentState)
-    while currentState[0:8] != '1w2w3w4w':
+    if ''.join(currentState[0]) == '1w2w3w4w':
+        return '0'
+
+    while ''.join(currentState[0]) != '1w2w3w4w':
         currentState = stateSpace[0]
         for i in range(1,5,1):
-            currentStateList = list(currentState)
-            currentStateList[0:8] = flip(stateSpace[0][0:8], i)
-            currentState = ''.join(currentStateList)
+            currentState[0] = flip(stateSpace[0][0], i)
+            currentState[1] = stateSpace[0][1] + str(i)
+            stateSpace.append(currentState)
 
-            stateSpace.append(currentState + str(i))
-            if currentState[0:8] == '1w2w3w4w':
-                currentState = currentState + str(i)
+            if ''.join(currentState[0]) == '1w2w3w4w':
+                currentState[1]  = currentState[1] + str(i)
                 break
         stateSpace.pop(0)
     return currentState[9:len(currentState)+1]
@@ -82,7 +74,7 @@ def printBreadthForSearchResult(startState, order):
     print(currentState)
     return
 
-userInput = input('welcome pancake challenger. enter your challenge, if you dare... \n\n')
+userInput = list(input('welcome pancake challenger. enter your challenge, if you dare... \n\n'))
 
 if(userInput[9] == 'a'):
     print('\ni see that you have challenged my A* search algorithm... \n\n\n                    BEHOLD!\n')
@@ -93,3 +85,4 @@ elif(userInput[9] == 'b'):
 else:
     print('foolish challenger... your request is dishonorable. what are you, scared?')
     input('give me a REAL challenge!\n\n')
+    userInput = list(input('welcome pancake challenger. enter your challenge, if you dare... \n\n'))
