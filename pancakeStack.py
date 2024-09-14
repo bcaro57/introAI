@@ -27,60 +27,98 @@ def flip(state, layer):
         stateList[0:2], stateList[2:4], stateList[4:6], stateList[6:8] = stateList[6:8], stateList[4:6], stateList[2:4], stateList[0:2]
         state = ''.join(stateList)
     return state
-## not started
+
+def heuristic(state):
+    stateList = list(state)
+    if stateList[6] == '4':
+        if stateList[4] == '3':
+            if stateList[2] == '2':
+                if stateList[0] == '1':
+                    if stateList[1] == 'b':
+                        return 1
+                    else:
+                        return 0
+            else:
+                return 2
+        else:
+            return 3
+    else:
+        return 4
+
+# not started
 def aStarSearch(userInput):
     stateSpace = []
-    currentState = userInput[0:8] + "-0-"
+    costSpace = []
+    currentState = userInput[0:8] + '-'
     stateSpace.append(currentState)
+    costSpace.append(0)
 
+    min(costSpace)
     while currentState[0:8] != '1w2w3w4w':
-        return
+        '''
+        - find the min value of f where f = g + h
+        - perform flip 
+        - add f to the costSpace
+        - take note of which layer was flipped
+        - redo till done
+        '''
+        # n = min(enumerate(costSpace))
+        # currentState = stateSpace[n][0:8]
+        # currentHeuristic = heuristic(currentState[0:8])
+        # cost = flipLayer + currentHeuristic
 
-    return currentState[9:len(currentState)+1]
+        # currentStateList = list(currentState)
+        # currentStateList[0:8] = flip(stateSpace[0][0:8], flipLayer)
+        # currentState = ''.join(currentStateList)
 
-## prints the A* result in the proper format
+        # stateSpace.append(currentState + str(flipLayer))
+
+    return currentState[9:len(currentState)+1] 
+
+# prints the A* result in the proper format
 def printAStarSearchResult(startState, order):
     currentState = startState
     orderList = list(order)
     while(len(orderList) > 0):
         if(orderList[0] == '1'):
-            print(currentState[0:2] + '|' + currentState[2:8] + ' g:' + currentState[9] + ' h: 1')
+            print(currentState[0:2] + '|' + currentState[2:8] + ' g:' + currentState[9] + ' h: ' + str(heuristic(currentState[0:8])))
             currentState = flip(currentState, int(orderList[0]))
         elif(orderList[0] == '2'):
-            print(currentState[0:4] + '|' + currentState[4:8] + ' g:' + currentState[9] + ' h: 2')
+            print(currentState[0:4] + '|' + currentState[4:8] + ' g:' + currentState[9] + ' h: ' + str(heuristic(currentState[0:8])))
             currentState = flip(currentState, int(orderList[0]))
         elif(orderList[0] == '3'):
-            print(currentState[0:6] + '|' + currentState[6:8] + ' g:' + currentState[9] + ' h: 3')
+            print(currentState[0:6] + '|' + currentState[6:8] + ' g:' + currentState[9] + ' h: ' + str(heuristic(currentState[0:8])))
             currentState = flip(currentState, int(orderList[0]))
         elif(orderList[0] == '4'):
-            print(currentState[0:8] + '|' + ' g:' + currentState[9] + ' h: 4')
+            print(currentState[0:8] + '|' + ' g:' + currentState[9] + ' h: ' + str(heuristic(currentState[0:8])))
             currentState = flip(currentState, int(orderList[0]))
         orderList.pop(0)
     print(currentState)
     return
 
+# this function uses a BFS algorithm to sort through the stack
 def breadthForSearch(userInput):
     stateSpace = []
-    currentState = userInput[0:8] + "-"
+    currentState = userInput[0:8] + '-'
     stateSpace.append(currentState)
 
     while currentState[0:8] != '1w2w3w4w':
         currentState = stateSpace[0]
-        for i in range(1,5,1):
+        for flipLayer in range(1,5,1):
             currentStateList = list(currentState)
-            currentStateList[0:8] = flip(stateSpace[0][0:8], i)
+            currentStateList[0:8] = flip(stateSpace[0][0:8], flipLayer)
             currentState = ''.join(currentStateList)
 
-            stateSpace.append(currentState + str(i))
+            stateSpace.append(currentState + str(flipLayer))
 
             if currentState[0:8] == '1w2w3w4w':
-                currentState = currentState + str(i)
+                currentState = currentState + str(flipLayer)
                 return currentState[9:len(currentState)+1]
 
         stateSpace.pop(0)
     return currentState[9:len(currentState)+1]
 
-## prints the BFS result in the proper format
+# prints the BFS result in the proper format
 def printBreadthForSearchResult(startState, order):
     currentState = startState
     orderList = list(order)
@@ -101,11 +139,7 @@ def printBreadthForSearchResult(startState, order):
     print(currentState)
     return
 
-
 userInput = input('welcome pancake challenger. enter your challenge, if you dare... \n\n')
-
-
-
 valid = False
 
 while valid == False:
