@@ -35,7 +35,7 @@ def heuristic(state):
             if stateList[2] == '2':
                 if stateList[0] == '1':
                     if stateList[1] == 'b':
-                        return 1
+                        return 0
                     else:
                         return 0
             else:
@@ -44,56 +44,112 @@ def heuristic(state):
             return 3
     else:
         return 4
+    
+def costCalculator(flipOrderList):
+    flipList = []
+    costList = []
+    for flip in flipOrderList:
+        flipList.append(int(flip))
+        costList.append(str(sum(flipList)))
+
+    return costList
 
 # not started
 def aStarSearch(userInput):
     stateSpace = []
     costSpace = []
+    hasSeenList = []
     currentState = userInput[0:8] + '-'
     stateSpace.append(currentState)
     costSpace.append(0)
 
-    min(costSpace)
-    while currentState[0:8] != '1w2w3w4w':
-        '''
-        - find the min value of f where f = g + h
-        - perform flip 
-        - add f to the costSpace
-        - take note of which layer was flipped
-        - redo till done
-        '''
-        # n = min(enumerate(costSpace))
-        # currentState = stateSpace[n][0:8]
-        # currentHeuristic = heuristic(currentState[0:8])
-        # cost = flipLayer + currentHeuristic
+    while stateSpace:
+        # identify the lowest cost, look for ties 
+        #
+        # if there are no ties, it will consider the one value by itself and look for the max of 1 element... 
+        # kinda stupid but i dont mind it too much since it seems to work
 
-        # currentStateList = list(currentState)
-        # currentStateList[0:8] = flip(stateSpace[0][0:8], flipLayer)
-        # currentState = ''.join(currentStateList)
+        val = min(costSpace)
+        tieList = []
+        tieNumberList = []
+        tieIndexList = []
+        for index, number in enumerate(costSpace):
+            val = number + heuristic(stateSpace[index][0:8])
+            if len(tieNumberList) == 0:
+                tieNumberList.append(stateSpace[index][0:8])
+                tieIndexList.append(index)
+            
+            if val < costSpace[tieIndexList[0]] + heuristic(tieNumberList[0]):
+                tieNumberList = []
+                tieIndexList = []
+                tieNumberList.append(stateSpace[index][0:8])
+                tieIndexList.append(index)
+            elif val == costSpace[tieIndexList[0]] + heuristic(tieNumberList[0]):
+                if len(tieNumberList) != 1:
+                    tieNumberList.append(stateSpace[index][0:8])
+                    tieIndexList.append(index)
+        tieList.append(tieNumberList)
+        tieList.append(tieIndexList)
+        
+        # turn the tied items into numbers
+        for tieIndex, ties in enumerate(tieList[0]):
+            tieItem = list(ties)
+            for i in range(1,8,2):
+                if (tieItem[i] == 'b'):
+                    tieItem[i] = '0'
+                elif (tieItem[i] == 'w'):
+                    tieItem[i] = '1'
+            tieList[0][tieIndex] = ''.join(tieItem)
 
-        # stateSpace.append(currentState + str(flipLayer))
+        # handle the ties and determines the item we will use
+        maxTie = max(tieList[0])
+        currentIndex = tieList[1][tieList[0].index(maxTie)]
+        currentState = stateSpace[currentIndex]
 
-    return currentState[9:len(currentState)+1] 
+        for flipLayer in range(1,5,1):
+
+            currentStateList = list(currentState)
+            currentStateList[0:8] = flip(stateSpace[currentIndex][0:8], flipLayer)
+            currentState = ''.join(currentStateList)
+            
+            if currentState[0:8] == '1w2w3w4w':
+                return stateSpace[currentIndex][9:len(currentState)+1] + str(flipLayer)
+
+            if currentState[0:8] not in hasSeenList:
+                hasSeenList.append(currentState[0:8])
+                stateSpace.append(currentState + str(flipLayer))
+                costSpace.append(flipLayer + costSpace[currentIndex])
+
+        stateSpace.pop(currentIndex)
+        costSpace.pop(currentIndex)
+
 
 # prints the A* result in the proper format
 def printAStarSearchResult(startState, order):
     currentState = startState
-    orderList = list(order)
+    orderList  = list(order)
+    costList = costCalculator(orderList)
+
+    orderList.append('0')
+    costList.insert(0, '0')
+
     while(len(orderList) > 0):
         if(orderList[0] == '1'):
-            print(currentState[0:2] + '|' + currentState[2:8] + ' g:' + currentState[9] + ' h: ' + str(heuristic(currentState[0:8])))
+            print(currentState[0:2] + '|' + currentState[2:8] + ' g:' + costList[0] + ' h: ' + str(heuristic(currentState[0:8])))
             currentState = flip(currentState, int(orderList[0]))
         elif(orderList[0] == '2'):
-            print(currentState[0:4] + '|' + currentState[4:8] + ' g:' + currentState[9] + ' h: ' + str(heuristic(currentState[0:8])))
+            print(currentState[0:4] + '|' + currentState[4:8] + ' g:' + costList[0] + ' h: ' + str(heuristic(currentState[0:8])))
             currentState = flip(currentState, int(orderList[0]))
         elif(orderList[0] == '3'):
-            print(currentState[0:6] + '|' + currentState[6:8] + ' g:' + currentState[9] + ' h: ' + str(heuristic(currentState[0:8])))
+            print(currentState[0:6] + '|' + currentState[6:8] + ' g:' + costList[0] + ' h: ' + str(heuristic(currentState[0:8])))
             currentState = flip(currentState, int(orderList[0]))
         elif(orderList[0] == '4'):
-            print(currentState[0:8] + '|' + ' g:' + currentState[9] + ' h: ' + str(heuristic(currentState[0:8])))
+            print(currentState[0:8] + '|' + ' g:' + costList[0] + ' h: ' + str(heuristic(currentState[0:8])))
             currentState = flip(currentState, int(orderList[0]))
+        else:
+            print(currentState + ' g:' + costList[0] + ' h: 0')
         orderList.pop(0)
-    print(currentState)
+        costList.pop(0)
     return
 
 # this function uses a BFS algorithm to sort through the stack
@@ -160,7 +216,7 @@ while valid == False:
 
 if(userInput[9] == 'a'):
     print('\ni see that you have challenged my A* search algorithm... \n\n\n                    BEHOLD!\n')
-    print(aStarSearch(userInput))
+    printAStarSearchResult(userInput[0:8], aStarSearch(userInput))
 elif(userInput[9] == 'b'):
     print('\ni see that you have challenged my BFS search algorithm... \n\n\n                   BEHOLD!\n')
     printBreadthForSearchResult(userInput[0:8], breadthForSearch(userInput))
