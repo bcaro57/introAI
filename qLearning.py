@@ -2,8 +2,7 @@ import numpy as np
 import random
 
 def inputHandler():
-    # userInput = input("enter your request. \n")
-    userInput = '15 12 8 6 p'
+    userInput = input("enter your request. \n")
     valid = True
 
     spaceIndexList = [0]
@@ -181,7 +180,7 @@ while iteration <= maxIterations:
     currentPosition = getPosition(currentSquare)
     boardInfo = board[currentPosition[0], currentPosition[1]]
     availableActions = setActionSpace(boardInfo)
-    
+
     if len(availableActions) == 1:
         action = availableActions[0]
     elif random.random() < epsilon:
