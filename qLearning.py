@@ -3,7 +3,7 @@ import random
 
 def inputHandler():
     # userInput = input("enter your request. \n")
-    userInput = '15 12 8 6 q 11'
+    userInput = '15 12 8 6 p'
     valid = True
 
     spaceIndexList = [0]
@@ -92,7 +92,7 @@ def setSquareReward(square, reward, special):
 
 def setActionSpace(boardInfo):
     if boardInfo[1] == 1 or boardInfo[1] == 2:
-        return 'out'
+        return ['out']
     else:
         return ['up', 'right', 'down', 'left']
 
@@ -177,12 +177,11 @@ iteration = 0
 currentSquare = 2       # 2 is always the start square
 
 while iteration <= maxIterations:
-    # learning loop
     iteration += 1
     currentPosition = getPosition(currentSquare)
     boardInfo = board[currentPosition[0], currentPosition[1]]
     availableActions = setActionSpace(boardInfo)
-    # choosing the action
+    
     if len(availableActions) == 1:
         action = availableActions[0]
     elif random.random() < epsilon:
@@ -195,18 +194,13 @@ while iteration <= maxIterations:
     if nextPosition != 0:
         nextSquareInfo = board[nextPosition[0], nextPosition[1]]
         if action == 'up':
-            # print((1-alpha)*boardInfo[2] + alpha*(nextSquareInfo[0] + gamma*max(nextSquareInfo[2:])), ', ', action)
             boardInfo[2] = (1-alpha)*boardInfo[2] + alpha*(nextSquareInfo[0] + gamma*max(nextSquareInfo[2:]))
         elif action == 'right':
-            # print((1-alpha)*boardInfo[3] + alpha*(nextSquareInfo[0] + gamma*max(nextSquareInfo[2:])), ', ', action)
             boardInfo[3] = (1-alpha)*boardInfo[3] + alpha*(nextSquareInfo[0] + gamma*max(nextSquareInfo[2:]))
         elif action == 'down':
-            # print((1-alpha)*boardInfo[4] + alpha*(nextSquareInfo[0] + gamma*max(nextSquareInfo[2:])), ', ', action)
             boardInfo[4] = (1-alpha)*boardInfo[4] + alpha*(nextSquareInfo[0] + gamma*max(nextSquareInfo[2:]))
         elif action == 'left':
-            # print((1-alpha)*boardInfo[5] + alpha*(nextSquareInfo[0] + gamma*max(nextSquareInfo[2:])), ', ', action)
             boardInfo[5] = (1-alpha)*boardInfo[5] + alpha*(nextSquareInfo[0] + gamma*max(nextSquareInfo[2:]))
-        print(boardInfo[2:], currentSquare)
         currentSquare = getIndex(nextPosition[0], nextPosition[1])
 
     else:
